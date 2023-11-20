@@ -12,14 +12,8 @@ public class Plant {
 
 
     public Plant(String name, String notes, LocalDate planted, LocalDate watering, int frequencyOfWatering) throws PlantException {
-        if (frequencyOfWatering <= 0) {
-            throw new PlantException("Frekvence zálivky nesmí být rovna nule, nebo v minusu. Zadáno: "+frequencyOfWatering+"");
-        }
-
-        if (watering.isBefore(planted)) {
-            throw new PlantException("Datum zálivky nesmí předcházet datu zasazení rostliny. Zadáná sadba: "+planted+", zálivka: "+watering+"");
-
-        }
+        validateFrequencyOfWatering(frequencyOfWatering);
+        validatePlantingAndWateringDates(planted, watering);
 
         this.id = nextId++;
         this.name = name;
@@ -28,6 +22,7 @@ public class Plant {
         this.watering = watering;
         this.frequencyOfWatering = frequencyOfWatering;
     }
+
 
 
     public Plant (String name, LocalDate planted, int frequencyOfWatering) throws PlantException {
@@ -68,20 +63,17 @@ public class Plant {
     }
 
     public void setPlanted(LocalDate planted) throws PlantException {
-        if (planted.isAfter(watering)) {
-            throw new PlantException("Datum sadby nesmí následovat po datu poslední zálivky. Zadaná poslední zálivka: " + watering + ", sadba: " + planted);
-        }
+        validatePlantingAndWateringDates(planted, this.watering);
         this.planted = planted;
     }
+
 
     public LocalDate getWatering() {
         return watering;
     }
 
     public void setWatering(LocalDate watering) throws PlantException {
-        if (watering.isBefore(planted)) {
-            throw new PlantException("Datum zálivky nesmí předcházet datu zasazení rostliny. Zadaná sadba: " + planted + ", zálivka: " + watering);
-        }
+        validatePlantingAndWateringDates(this.planted, watering);
         this.watering = watering;
     }
 
@@ -90,9 +82,7 @@ public class Plant {
     }
 
     public void setFrequencyOfWatering(int frequencyOfWatering) throws PlantException {
-        if (frequencyOfWatering <= 0) {
-            throw new PlantException("Frekvence zálivky nesmí být rovna nule, nebo v minusu. Zadáno: " + frequencyOfWatering);
-        }
+        validateFrequencyOfWatering(frequencyOfWatering);
         this.frequencyOfWatering = frequencyOfWatering;
     }
 
@@ -102,4 +92,16 @@ public class Plant {
                 getId(), getName(), getPlanted().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")), getWatering().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")), getFrequencyOfWatering());
 
     }
+    private void validatePlantingAndWateringDates(LocalDate planted, LocalDate watering) throws PlantException {
+        if (watering.isBefore(planted)) {
+            throw new PlantException("Datum zálivky nesmí předcházet datu zasazení rostliny. Zadaná sadba: " + planted + ", zálivka: " + watering);
+        }
+    }
+
+    private void validateFrequencyOfWatering(int frequencyOfWatering) throws PlantException {
+        if (frequencyOfWatering <= 0) {
+            throw new PlantException("Frekvence zálivky nesmí být rovna nule, nebo v minusu. Zadáno: " + frequencyOfWatering);
+        }
+    }
 }
+
